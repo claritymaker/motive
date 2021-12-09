@@ -1,10 +1,5 @@
-import asyncio
-
-from motive.runner import IteratorError, RunnerContext, count, iterate, run
-
-
-def _get_current_level(context):
-    return context[-1]["current_level"]
+from motive.runner import IteratorError
+from motive.itr import count, iterate
 
 
 def test_iterate():
@@ -42,21 +37,3 @@ def test_count():
                 pass
             else:
                 raise
-
-
-def test_runner_sync():
-    def t1(test):
-        return {f"t1_{test}": test ** 2}
-
-    t1.update_context = True
-
-    default_arguments = {"a": 1, "b": 2}
-    callables = [count("test", 5), t1]
-    co = run(callables, default_arguments=default_arguments, catch=(IteratorError,))
-    ctx = asyncio.run(co)
-
-    return ctx
-
-
-if __name__ == "__main__":
-    test_runner_sync()
