@@ -1,8 +1,9 @@
 import asyncio
-from argument_inserter.insert_arguments import insert_arguments
-from typing import Dict, Optional, Any, Iterable
-from asyncio import Event
 import inspect
+from asyncio import Event
+from typing import Any, Dict, Iterable, Optional
+
+from motive.insert_arguments import insert_arguments
 
 
 class RunnerError(Exception):
@@ -15,7 +16,9 @@ class IteratorError(RunnerError):
 
 class RunnerContext:
     def __init__(self):
-        self._states: Dict[int, Dict[str, Any]] = {-1: {"running": Event(), "current_level": -1}}
+        self._states: Dict[int, Dict[str, Any]] = {
+            -1: {"running": Event(), "current_level": -1}
+        }
 
     @property
     def current_level(self) -> int:
@@ -29,7 +32,7 @@ class RunnerContext:
         if level is None:
             level = self.current_level
 
-        itr = range(start_level, level+1, 1-2*int(start_level>level))
+        itr = range(start_level, level + 1, 1 - 2 * int(start_level > level))
         output = {}
         for s in [self._states.get(x, {}) for x in itr]:
             output.update(s)
@@ -61,7 +64,9 @@ def count(name, stop: Optional[int] = None, step: int = 1, start: int = 0):
         try:
             output[name] = current_context[name] + current_context[f"{name}_step"]
             if current_context[f"{name}_stop"] is not None:
-                if (current_context[f"{name}_stop"] - output[name]) / current_context[f"{name}_step"] < 0:
+                if (current_context[f"{name}_stop"] - output[name]) / current_context[
+                    f"{name}_step"
+                ] < 0:
                     raise IteratorError()
 
         except KeyError:
@@ -96,7 +101,16 @@ def iterate(name, source: Iterable):
     return _iterate
 
 
-async def run(callables, context: Optional[RunnerContext] = None, default_arguments=None, catch: Iterable[BaseException] = tuple(), force_sync=False):
+from typing import Type
+
+
+async def run(
+    callables,
+    context: Optional[RunnerContext] = None,
+    default_arguments=None,
+    catch: Iterable[Type[BaseException]] = tuple(),
+    force_sync=False,
+):
     if context is None:
         context = RunnerContext()
 
@@ -113,8 +127,13 @@ async def run(callables, context: Optional[RunnerContext] = None, default_argume
         while True:
             for c in callables:
                 await context._states[-1]["running"].wait()
-                meta_arguments = {"context": context, "current_context": context.current_context}
-                p = insert_arguments(c, *default_arguments, context.as_dict(), meta_arguments)
+                meta_arguments = {
+                    "context": context,
+                    "current_context": context.current_context,
+                }
+                p = insert_arguments(
+                    c, *default_arguments, context.as_dict(), meta_arguments
+                )
                 if inspect.iscoroutinefunction(p):
                     current_await.append(p())
                     if not force_sync:
@@ -143,4 +162,3 @@ async def run(callables, context: Optional[RunnerContext] = None, default_argume
         context._states[-1]["current_level"] = context.current_level - 1
 
     return context
-

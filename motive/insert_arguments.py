@@ -1,7 +1,6 @@
-from typing import Callable
 import inspect
-
 from functools import partial
+from typing import Callable
 
 
 def insert_arguments(function, *sources) -> Callable:

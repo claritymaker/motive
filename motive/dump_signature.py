@@ -1,7 +1,6 @@
-from inspect import Signature, isclass
-from enum import Enum
-
 import json
+from enum import Enum
+from inspect import Signature, isclass
 
 
 def _default(e):
@@ -32,5 +31,3 @@ def dump_signature(signature: Signature) -> str:
 
     sig["parameters"] = parameters
     return json.dumps(sig, default=_default)
-
-
