@@ -10,11 +10,12 @@ def test_iterate():
         try:
             ans = itr(ctx)
             ctx.update(ans)
-            assert ctx == {
+            expected_ans = {
                 "test": source[i],
-                "test_finished": source[0 : i - 1],
-                "test_remaining": source[i:],
+                "test_finished": source[0:i],
+                "test_remaining": source[i + 1 :],
             }
+            assert ctx == expected_ans
         except IteratorError:
             if i == len(source):
                 return None

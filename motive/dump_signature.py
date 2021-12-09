@@ -1,6 +1,8 @@
 import json
 from enum import Enum
 from inspect import Signature, isclass
+import inspect
+from typing import Dict
 
 
 def _default(e):
@@ -15,7 +17,7 @@ def _default(e):
     raise TypeError(f"got {e}")
 
 
-def dump_signature(signature: Signature) -> str:
+def dump_signature(signature: Signature) -> Dict:
     sig = {}
     if signature.return_annotation is not Signature.empty:
         sig["return_annotation"] = signature.return_annotation
@@ -30,4 +32,15 @@ def dump_signature(signature: Signature) -> str:
         parameters[param.name] = p
 
     sig["parameters"] = parameters
-    return json.dumps(sig, default=_default)
+    return sig
+
+def dumps_signature(signature: Signature) -> str:
+    return json.dumps(dump_signature(signature), default=_default)
+
+def dump_callable(callable) -> Dict:
+    sig = inspect.signature(callable)
+    return dump_signature(sig)
+
+def dumps_callable(callable) -> str:
+    sig = inspect.signature(callable)
+    return dumps_signature(sig)

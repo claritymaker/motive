@@ -1,28 +1,25 @@
-import asyncio
-import inspect
-from asyncio import Event
 from typing import Any, Dict, Iterable, Optional
-from typing import Type
 
-from motive.insert_arguments import insert_arguments
-from motive.runner import IteratorError, RunnerError
+from motive.runner import IteratorError
 
 
 def count(name, stop: Optional[int] = None, step: int = 1, start: int = 0):
     def _count(current_context: Dict[str, Any]):
-        output = {}
-        try:
-            output[name] = current_context[name] + current_context[f"{name}_step"]
-            if current_context[f"{name}_stop"] is not None:
-                if (current_context[f"{name}_stop"] - output[name]) / current_context[
-                    f"{name}_step"
-                ] < 0:
-                    raise IteratorError()
+        output = {
+            f"{name}_step": current_context.get(f"{name}_step", step),
+            f"{name}_stop": current_context.get(f"{name}_stop", stop),
+            name: current_context.get(name, start),
+        }
 
-        except KeyError:
-            output[f"{name}_step"] = step
-            output[f"{name}_stop"] = stop
-            output[name] = start
+        if name in current_context:
+            output[name] = output[name] + output[f"{name}_step"]
+
+        if output[f"{name}_stop"] is not None:
+            if (output[f"{name}_stop"] - output[name]) / output[
+                f"{name}_step"
+            ] < 0:
+                raise IteratorError()
+
         return output
 
     _count.update_context = True
@@ -31,19 +28,17 @@ def count(name, stop: Optional[int] = None, step: int = 1, start: int = 0):
 
 def iterate(name, source: Iterable):
     def _iterate(current_context: Dict[str, Any]):
-        output = {}
-        try:
-            output[f"{name}_finished"].append(output[name])
-            try:
-                output[name] = current_context[f"{name}_remaining"].pop(0)
-            except IndexError:
-                raise IteratorError()
+        output = {
+            f"{name}_finished": current_context.get(f"{name}_finished", []),
+            f"{name}_remaining": current_context.get(f"{name}_remaining", list(source)),
+        }
+        if name in current_context:
+            output[f"{name}_finished"].append(current_context[name])
 
-        except KeyError:
-            itr = (x for x in source)
-            output[name] = next(itr)
-            output[f"{name}_remaining"] = list(itr)
-            output[f"{name}_finished"] = []
+        try:
+            output[name] = output[f"{name}_remaining"].pop(0)
+        except IndexError:
+            raise IteratorError()
 
         return output
 
