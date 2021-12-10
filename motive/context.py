@@ -5,9 +5,12 @@ from typing import Any, Dict, Iterable, Optional
 from typing import Type
 
 from motive.insert_arguments import insert_arguments
+from motive.properties import Properties
 
 
-class RunnerContext:
+class Context:
+    AUTO = object()
+
     def __init__(self):
         self._states: Dict[int, Dict[str, Any]] = {
             -1: {"running": Event(), "current_level": -1}
@@ -49,3 +52,4 @@ class RunnerContext:
 
     def __setitem__(self, key: str, value: Any):
         self.set(self.current_level, key, value)
+

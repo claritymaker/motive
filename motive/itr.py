@@ -1,6 +1,7 @@
 from typing import Any, Dict, Iterable, Optional
 
 from motive.runner import IteratorError
+from motive.context import Properties
 
 
 def count(name, stop: Optional[int] = None, step: int = 1, start: int = 0):
@@ -22,7 +23,7 @@ def count(name, stop: Optional[int] = None, step: int = 1, start: int = 0):
 
         return output
 
-    _count.update_context = True
+    _count.motive_properties = Properties(update_context=True)
     return _count
 
 
@@ -42,5 +43,5 @@ def iterate(name, source: Iterable):
 
         return output
 
-    _iterate.update_context = True
+    _count.motive_properties = Properties(update_context=True)
     return _iterate
