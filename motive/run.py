@@ -6,15 +6,17 @@ from typing import Type
 
 from motive.insert_arguments import insert_arguments
 from motive.properties import Properties
+from motive.context import Context
 
 async def run(
-        self,
         callables,
         default_arguments=None,
         catch: Iterable[Type[BaseException]] = tuple(),
+        context: Optional[Context] = None,
         force_sync=False,
 ):
-    context = self
+    if context is None:
+        context = Context()
 
     if default_arguments is None:
         default_arguments = []

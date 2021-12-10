@@ -1,4 +1,4 @@
-from motive.runner import IteratorError
+from motive.exceptions import IteratorError
 from motive.itr import count, iterate
 
 
