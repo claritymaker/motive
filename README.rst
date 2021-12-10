@@ -1,0 +1,5 @@
+Motive is a framework for defining sequences of nested functions and executing them in a manner that makes it easy to observe and change as they progress. The original purpose is to help easily and correctly define tests that would otherwise be highly nested.
+
+You supply motive.run with a list of callables and exception types to catch. Motive will then step through each callable (or gather sequential callables together if they are async) and execute them. A motive.Context is maintained while the functions are being run. Any function that has an argument with the same name as a key in the context will be automatically applied. You can modify the properties of a callable to make it add it's return value (Dict[str, obj]) to the context.
+
+Context will keep track of how many nested levels it is in and separate the keys by which level they were added in (higher levels override lower levels). For example, if you look at the context from level 3, you will not see any of the key/value pairs added in level 4 and higher.
