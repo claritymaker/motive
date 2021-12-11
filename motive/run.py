@@ -37,42 +37,35 @@ async def run(
             for c in list(callables) + [no_op]:
                 await context._states[-1]["running"].wait()
 
-                if not callable(c):
-                    # await run(c, context=context, default_arguments=default_arguments, catch=(IteratorError, ))
-                    ...
-                else:
-                    current_props = getattr(c, "motive_properties", Properties())
-                    meta_arguments = {}
-                    if current_props.include_meta_arguments:
-                        meta_arguments["context"] = context
-                        meta_arguments["current_context"] = context.current_context
-                        meta_arguments["default_arguments"] = default_arguments
+                current_props = getattr(c, "motive_properties", Properties())
+                meta_arguments = {}
+                if current_props.include_meta_arguments:
+                    meta_arguments["context"] = context
+                    meta_arguments["current_context"] = context.current_context
+                    meta_arguments["default_arguments"] = default_arguments
 
-                    p = insert_arguments(
-                        c, *default_arguments, context.as_dict(level), meta_arguments
-                    )
+                p = insert_arguments(
+                    c, *default_arguments, context.as_dict(level), meta_arguments
+                )
 
-                    if inspect.iscoroutinefunction(p):
-                        current_await.append(p())
-                        current_await_props.append(current_props)
-                        if not force_sync and not current_props.force_sync:
-                            continue
+                if inspect.iscoroutinefunction(p):
+                    current_await.append(p())
+                    current_await_props.append(current_props)
+                    if not force_sync and not current_props.force_sync:
+                        continue
 
-                    # we will only get here on a sync function
-                    if current_await:
-                        ans = await asyncio.gather(*current_await, return_exceptions=False)
-                        for i, a in enumerate(ans):
-                            if current_await_props[i].update_context:
-                                context.update(level, a)
-                        current_await.clear()
-                        current_await_props.clear()
-                        # I'm not sure why this was here so I commented it out
-                        # if force_sync or current_props.force_sync:
-                        #     continue
+                # we will only get here on a sync function
+                if current_await:
+                    ans = await asyncio.gather(*current_await, return_exceptions=False)
+                    for i, a in enumerate(ans):
+                        if current_await_props[i].update_context:
+                            context.update(level, a)
+                    current_await.clear()
+                    current_await_props.clear()
 
-                    answer = p()
-                    if current_props.update_context:
-                        context.update(level, answer)
+                answer = p()
+                if current_props.update_context:
+                    context.update(level, answer)
 
     except tuple(catch):
         pass
