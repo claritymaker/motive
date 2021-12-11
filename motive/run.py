@@ -43,6 +43,7 @@ async def run(
                     meta_arguments["context"] = context
                     meta_arguments["current_context"] = context.current_context
                     meta_arguments["default_arguments"] = default_arguments
+                    meta_arguments["level"] = level
 
                 p = insert_arguments(
                     c, *default_arguments, context.as_dict(level), meta_arguments
