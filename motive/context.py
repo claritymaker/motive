@@ -24,7 +24,7 @@ class Context:
     def current_context(self) -> Dict[str, Any]:
         return self._states[self.current_level]
 
-    def as_dict(self, level: Optional[int] = None, start_level=0) -> Dict[str, Any]:
+    def as_dict(self, level: Optional[int], start_level=0) -> Dict[str, Any]:
         if level is None:
             level = self.current_level
 

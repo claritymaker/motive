@@ -49,7 +49,7 @@ async def run(
                         meta_arguments["default_arguments"] = default_arguments
 
                     p = insert_arguments(
-                        c, *default_arguments, context.as_dict(), meta_arguments
+                        c, *default_arguments, context.as_dict(level), meta_arguments
                     )
 
                     if inspect.iscoroutinefunction(p):

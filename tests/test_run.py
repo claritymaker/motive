@@ -5,13 +5,8 @@ from datetime import datetime
 from motive.run import run
 from motive.properties import Properties
 from motive.exceptions import IteratorError
-from motive.context import Context
 from motive.nest import nest
-from motive.itr import count, iterate
-
-
-def _get_current_level(context):
-    return context[-1]["current_level"]
+from motive.itr import count
 
 
 def test_runner_sync():
