@@ -29,7 +29,7 @@ def test_iterate():
 def test_count():
     ctx = Context()
     c = count("test", 10)
-    for i in range(11):
+    for i in range(10):
         try:
             ans = c(context=ctx, current_context=ctx.as_dict(0), level=0)
             ctx.update(0, ans)

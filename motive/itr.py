@@ -5,7 +5,7 @@ from motive.context import Properties
 from motive.context import Context
 
 
-def count(name: str, stop: Union[None, int, str] = None, step: Union[None, int, str] = 1, start: Union[int, str] = 0):
+def count(name: str, stop: Union[None, int, str] = None, step: Union[None, int, str] = 1, start: Union[int, str] = 0, inclusive: bool = False):
     def _count(level: int, context: Context, current_context: Dict[str, Any]):
         output = {}
 
@@ -36,8 +36,12 @@ def count(name: str, stop: Union[None, int, str] = None, step: Union[None, int, 
         output[name] = c_val + c_step
 
         if c_stop is not None:
-            if (c_stop - c_val) / c_step < 0:
-                raise IteratorError()
+            if inclusive:
+                if (c_stop - c_val) < c_step:
+                    raise IteratorError()
+            else:
+                if (c_stop - c_val) <= c_step:
+                    raise IteratorError()
 
         return output
 

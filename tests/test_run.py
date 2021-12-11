@@ -23,7 +23,7 @@ def test_runner_sync():
     t2.motive_properties = Properties(update_context = False)
 
     default_arguments = {"a": 1, "b": 2}
-    callables = [count("test", 5), t1, t2, t3]
+    callables = [count("test", 5, inclusive=True), t1, t2, t3]
     co = run(callables, default_arguments=default_arguments, catch=(IteratorError,))
     ctx = asyncio.run(co)
     assert ctx.as_dict(1) == {
@@ -56,7 +56,7 @@ def test_runner_async():
     t2.motive_properties = Properties(update_context = False)
 
     default_arguments = {"a": 1, "b": 2}
-    callables = [count("test", 5), t1, t2, t3]
+    callables = [count("test", 5, inclusive=True), t1, t2, t3]
     co = run(callables, default_arguments=default_arguments, catch=(IteratorError,))
     start_time = datetime.now()
     ctx = asyncio.run(co)
@@ -89,9 +89,9 @@ def test_runner_nested():
 
     default_arguments = {"a": 1, "b": 2}
     callables = [
-        count("test", 5),
+        count("test", 5, inclusive=True),
         t1,
-        nest([count("test2", 5), t2], catch=(IteratorError, )),
+        nest([count("test2", 5, inclusive=True), t2], catch=(IteratorError, )),
     ]
     co = run(callables, default_arguments=default_arguments, catch=(IteratorError,))
     ctx = asyncio.run(co)
